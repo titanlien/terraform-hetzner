@@ -57,6 +57,9 @@ output "public_ip4" {
 }
 
 resource "null_resource" "ansible-main" {
+  triggers = {
+    template_rendered = data.template_file.inventory.rendered
+  }
   provisioner "local-exec" {
     command = "ssh-keyscan -H ${hcloud_server.master.ipv4_address} >> ~/.ssh/known_hosts && ansible-playbook -e sshKey=${var.pvt_key} -i ./ansible/inventory --limit managers ./ansible/main.yml"
   }
