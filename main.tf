@@ -1,6 +1,10 @@
 variable "hcloud_token" {
 }
 
+variable "pvt_key" {
+  default = "/Users/titan/.ssh/id_rsa"
+}
+
 terraform {
   backend "s3" {
     encrypt = true
@@ -21,7 +25,7 @@ resource "hcloud_ssh_key" "default" {
   public_key = file("~/.ssh/id_rsa.pub")
 }
 
-resource "hcloud_server" "hetzner-master" {
+resource "hcloud_server" "master" {
   name        = "master"
   image       = "centos-7"
   server_type = "cx11"
@@ -43,11 +47,19 @@ resource "hcloud_network_subnet" "vlan1" {
 }
 
 resource "hcloud_server_network" "srvnetwork" {
-  server_id = "${hcloud_server.hetzner-master.id}"
+  server_id = "${hcloud_server.master.id}"
   network_id = "${hcloud_network.privNet.id}"
   ip = "10.0.1.10"
 }
 
 output "public_ip4" {
-  value = hcloud_server.hetzner-master.ipv4_address
+  value = hcloud_server.master.ipv4_address
+}
+
+resource "null_resource" "ansible-main" {
+  provisioner "local-exec" {
+    command = "ssh-keyscan -H ${hcloud_server.master.ipv4_address} >> ~/.ssh/known_hosts && ansible-playbook -e sshKey=${var.pvt_key} -i '${hcloud_server.master.ipv4_address}'-e ANSIBLE_STDOUT_CALLBACK=debug ./ansible/mail.yml"
+  }
+
+  depends_on = ["hcloud_server.master"]
 }
