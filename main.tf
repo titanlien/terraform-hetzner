@@ -3,9 +3,10 @@ variable "hcloud_token" {
 
 terraform {
   backend "s3" {
-    bucket = "tfm-titan"
+    encrypt = true
+    bucket = "tfstate-titan"
     key    = "hetzner/terraform.tfstate"
-    region = "eu-central-1"
+    region = "eu-west-1"
   }
 }
 
