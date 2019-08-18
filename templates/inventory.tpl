@@ -1,3 +1,5 @@
 [managers]
+${managers}
 
 [workers]
+${workers}

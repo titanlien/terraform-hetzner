@@ -58,8 +58,8 @@ output "public_ip4" {
 
 resource "null_resource" "ansible-main" {
   provisioner "local-exec" {
-    command = "ssh-keyscan -H ${hcloud_server.master.ipv4_address} >> ~/.ssh/known_hosts && ansible-playbook -e sshKey=${var.pvt_key} -i '${hcloud_server.master.ipv4_address}' ./ansible/main.yml"
+    command = "ssh-keyscan -H ${hcloud_server.master.ipv4_address} >> ~/.ssh/known_hosts && ansible-playbook -e sshKey=${var.pvt_key} -i ./ansible/inventory --limit managers ./ansible/main.yml"
   }
 
-  depends_on = ["hcloud_server.master"]
+  depends_on = ["hcloud_server.master", "null_resource.cmd"]
 }
