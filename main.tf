@@ -28,7 +28,7 @@ resource "hcloud_ssh_key" "default" {
 resource "hcloud_server" "master" {
   name        = "master"
   image       = "centos-7"
-  server_type = "cx11"
+  server_type = "cx11-ceph"
   ssh_keys    = [hcloud_ssh_key.default.name]
   keep_disk   = true
   location    = "fsn1"
